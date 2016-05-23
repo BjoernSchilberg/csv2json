@@ -21,7 +21,7 @@ Place the resulting `csv2json` and `json2csv` binaries into your PATH.
 
 Format the output:
 
-    $ cat file.csv | ./csv2json | python -mjson.tool
+    $ cat file.csv | ./csv2json -p
 
 ## Testing with real data.
 

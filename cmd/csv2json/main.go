@@ -6,22 +6,35 @@ package main
 
 import (
 	"bufio"
+	"bytes"
 	"encoding/csv"
 	"encoding/json"
+	"flag"
 	"io"
 	"log"
 	"os"
 )
 
+func errCheck(err error) {
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
 func main() {
+
+	var pretty bool
+
+	flag.BoolVar(&pretty, "pretty", false, "pretty print the JSON output.")
+	flag.BoolVar(&pretty, "p", false, "pretty print the JSON output (shorthand).")
+
+	flag.Parse()
 
 	r := csv.NewReader(bufio.NewReader(os.Stdin))
 	r.FieldsPerRecord = -1
 
 	header, err := r.Read()
-	if err != nil {
-		log.Fatal(err)
-	}
+	errCheck(err)
 
 	var records []map[string]string
 
@@ -30,9 +43,7 @@ func main() {
 		if err == io.EOF {
 			break
 		}
-		if err != nil {
-			log.Fatal(err)
-		}
+		errCheck(err)
 
 		record := map[string]string{}
 		for i, name := range header {
@@ -45,8 +56,15 @@ func main() {
 		records = append(records, record)
 	}
 
-	encoder := json.NewEncoder(bufio.NewWriter(os.Stdout))
-	if err := encoder.Encode(records); err != nil {
-		log.Fatal(err)
+	if pretty {
+		b, err := json.Marshal(records)
+		errCheck(err)
+		var out bytes.Buffer
+		json.Indent(&out, b, "", "\t")
+		_, err = out.WriteTo(os.Stdout)
+		errCheck(err)
+	} else {
+		encoder := json.NewEncoder(bufio.NewWriter(os.Stdout))
+		errCheck(encoder.Encode(records))
 	}
 }
