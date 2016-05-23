@@ -6,7 +6,7 @@
 
 ## Build
 
-    $ go get -u bitbucket.org/BjoernSchilberg/csv2json/cmd/csv2json
+    $ go get -u bitbucket.org/BjoernSchilberg/csv2json 
 
 Place the resulting `csv2json` binary into your PATH.
 
@@ -21,6 +21,15 @@ Or
 Format the output:
 
     $ cat file.csv | ./csv2json | python -mjson.tool
+
+## Testing with real data.
+
+Real data for testing is for e.g. available from the USGS [Earthquake Hazards
+Program](http://earthquake.usgs.gov/earthquakes/) as
+[csv](http://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php).
+
+   $ curl http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv | csv2json > all_month.json
+
 
 ## License
 This is Free Software under the terms of the MIT license.
