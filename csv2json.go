@@ -8,7 +8,6 @@ import (
 	"bufio"
 	"encoding/csv"
 	"encoding/json"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -16,10 +15,7 @@ import (
 
 func main() {
 
-	in := bufio.NewReader(os.Stdin)
-
-	r := csv.NewReader(in)
-
+	r := csv.NewReader(bufio.NewReader(os.Stdin))
 	r.FieldsPerRecord = -1
 
 	header, err := r.Read()
@@ -30,31 +26,27 @@ func main() {
 	var records []map[string]string
 
 	for {
-
 		fields, err := r.Read()
 		if err == io.EOF {
 			break
-		} else if err != nil {
+		}
+		if err != nil {
 			log.Fatal(err)
 		}
 
-		record := make(map[string]string)
-		for i := range fields {
-			if i == len(header) {
+		record := map[string]string{}
+		for i, name := range header {
+			if i == len(fields) {
 				break
 			}
-
-			record[header[i]] = fields[i]
+			record[name] = fields[i]
 		}
 
 		records = append(records, record)
 	}
 
-	jsondata, err := json.Marshal(records) // convert to JSON
-
-	if err != nil {
+	encoder := json.NewEncoder(bufio.NewWriter(os.Stdout))
+	if err := encoder.Encode(records); err != nil {
 		log.Fatal(err)
 	}
-
-	fmt.Println(string(jsondata))
 }
