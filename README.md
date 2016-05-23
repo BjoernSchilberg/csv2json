@@ -6,7 +6,7 @@
 
 ## Build
 
-    $ go get -u bitbucket.org/BjoernSchilberg/csv2json 
+    $ go get -u bitbucket.org/BjoernSchilberg/csv2json/cmd/csv2json
 
 or if you want to go the other way:
 
