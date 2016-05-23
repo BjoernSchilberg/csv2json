@@ -27,7 +27,7 @@ Format the output:
 
 Real data for testing is for e.g. available from the USGS
 [Earthquake Hazards Program](http://earthquake.usgs.gov/earthquakes/) as
-[csv](http://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php).
+[CSV](http://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php).
 
     $ curl http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv | csv2json > all_month.json
 
