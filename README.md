@@ -8,15 +8,16 @@
 
     $ go get -u bitbucket.org/BjoernSchilberg/csv2json/cmd/csv2json
 
-Place the resulting `csv2json` binary into your PATH.
+or if you want to go the other way:
+
+    $ go get -u bitbucket.org/BjoernSchilberg/csv2json/cmd/json2csv
+
+Place the resulting `csv2json` and `json2csv` binaries into your PATH.
 
 ## Usage
 
-    $ cat file.csv | csv2json
-
-Or
-
-    $ csv2json  < files.csv
+    $ csv2json < file.csv > file.json
+    $ json2csv < file.json > file.csv
 
 Format the output:
 
