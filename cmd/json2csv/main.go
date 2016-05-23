@@ -26,10 +26,8 @@ func createHeader(entry map[string]interface{}) []string {
 }
 
 func main() {
-	var header, record []string
 
-	stdin := bufio.NewReader(os.Stdin)
-	decoder := json.NewDecoder(stdin)
+	decoder := json.NewDecoder(bufio.NewReader(os.Stdin))
 
 	var lines []map[string]interface{}
 	err := decoder.Decode(&lines)
@@ -37,8 +35,9 @@ func main() {
 		log.Fatalf("Cannot decode JSON file: %v.\n", err)
 	}
 
-	stdout := bufio.NewWriter(os.Stdout)
-	out := csv.NewWriter(stdout)
+	out := csv.NewWriter(bufio.NewWriter(os.Stdout))
+
+	var header, record []string
 
 	for line, entry := range lines {
 		if header == nil {
