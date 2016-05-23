@@ -1,4 +1,4 @@
-#csv2json - A simple tool to convert csv to json
+#csv2json - A simple tool to convert CSV to JSON
 
 * Reads CSV records from standard in.
 * Outputs a JSON array of map entries to standard out. 
@@ -25,8 +25,8 @@ Format the output:
 
 ## Testing with real data.
 
-Real data for testing is for e.g. available from the USGS [Earthquake Hazards
-Program](http://earthquake.usgs.gov/earthquakes/) as
+Real data for testing is for e.g. available from the USGS
+[Earthquake Hazards Program](http://earthquake.usgs.gov/earthquakes/) as
 [csv](http://earthquake.usgs.gov/earthquakes/feed/v1.0/csv.php).
 
     $ curl http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv | csv2json > all_month.json
