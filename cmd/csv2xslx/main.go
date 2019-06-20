@@ -29,50 +29,53 @@ func main() {
 	header, err := r.Read()
 	errCheck(err)
 
-	var records []map[string]string
-
-	for {
-		fields, err := r.Read()
-		if err == io.EOF {
-			break
-		}
-		errCheck(err)
-
-		record := map[string]string{}
-		for i, name := range header {
-			if i == len(fields) {
-				break
-			}
-			record[name] = fields[i]
-		}
-
-		records = append(records, record)
-	}
-
 	xlsx := excelize.NewFile()
 	sheet := "Sheet1"
 	index := xlsx.NewSheet(sheet)
 
-	// Set first row as header
-	for cellIndex, entry := range header {
-		col, _ := excelize.ColumnNumberToName(cellIndex + 1)
-		xlsx.SetCellStr(sheet, fmt.Sprintf("%s%d", col, 1), entry)
+	colNames := make([]string, len(header))
+	for i := range header {
+		colNames[i], _ = excelize.ColumnNumberToName(i + 1)
 	}
 
-	for rowIndex, entry := range records {
+	// Set first row as header
+	for i, entry := range header {
+		xlsx.SetCellStr(sheet, fmt.Sprintf("%s%d", colNames[i], 1), entry)
+	}
 
-		for cellIndex, name := range header {
-			col, _ := excelize.ColumnNumberToName(cellIndex + 1)
-			if _, found := entry[name]; found {
-				xlsx.SetCellStr(sheet, fmt.Sprintf("%s%d", col, rowIndex+2), entry[name])
-			} else {
-				xlsx.SetCellStr(sheet, fmt.Sprintf("%s%d", col, rowIndex+2), "")
-			}
-			cellIndex++
+rows:
+	for row := 2; ; row++ {
+		fields, err := r.Read()
+		switch {
+		case err == io.EOF:
+			break rows
+		case err != nil:
+			log.Fatal(err)
+		}
+
+		var n int
+		if len(fields) < len(header) {
+			n = len(fields)
+		} else {
+			n = len(header)
+		}
+
+		var column int
+		for ; column < n; column++ {
+			xlsx.SetCellStr(
+				sheet,
+				fmt.Sprintf("%s%d", colNames[column], row),
+				fields[column])
+		}
+
+		for ; column < len(header); column++ {
+			xlsx.SetCellStr(
+				sheet,
+				fmt.Sprintf("%s%d", colNames[column], row),
+				"")
 		}
 	}
-	xlsx.SetActiveSheet(index)
-	err1 := xlsx.SaveAs("out.xlsx")
-	errCheck(err1)
 
+	xlsx.SetActiveSheet(index)
+	errCheck(xlsx.SaveAs("out.xlsx"))
 }
