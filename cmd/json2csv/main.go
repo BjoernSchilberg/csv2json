@@ -50,7 +50,12 @@ func main() {
 		for i, name := range header {
 			var value string
 			if v, found := entry[name]; found {
-				value = fmt.Sprintf("%s", v)
+				switch t := v.(type) {
+				case string:
+					value = fmt.Sprintf("%s", t)
+				case float64:
+					value = fmt.Sprint(t)
+				}
 			} else {
 				log.Printf("key %v not found in line %d.\n", name, line+1)
 			}
