@@ -8,10 +8,10 @@ import (
 	"bufio"
 	"encoding/csv"
 	"flag"
-	"fmt"
 	"io"
 	"log"
 	"os"
+	"strconv"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
@@ -53,7 +53,7 @@ func main() {
 
 	// Set first row as header
 	for i, entry := range header {
-		xlsx.SetCellStr(sheet, fmt.Sprintf("%s%d", colNames[i], 1), entry)
+		xlsx.SetCellStr(sheet, colNames[i]+"1", entry)
 	}
 
 rows:
@@ -73,19 +73,14 @@ rows:
 			n = len(header)
 		}
 
+		rowS := strconv.Itoa(row)
 		var column int
 		for ; column < n; column++ {
-			xlsx.SetCellStr(
-				sheet,
-				fmt.Sprintf("%s%d", colNames[column], row),
-				fields[column])
+			xlsx.SetCellStr(sheet, colNames[column]+rowS, fields[column])
 		}
 
 		for ; column < len(header); column++ {
-			xlsx.SetCellStr(
-				sheet,
-				fmt.Sprintf("%s%d", colNames[column], row),
-				"")
+			xlsx.SetCellStr(sheet, colNames[column]+rowS, "")
 		}
 	}
 
