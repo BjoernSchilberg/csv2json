@@ -7,6 +7,7 @@ package main
 import (
 	"bufio"
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"io"
 	"log"
@@ -23,6 +24,13 @@ func errCheck(err error) {
 
 func main() {
 
+	var sheetName string
+
+	flag.StringVar(&sheetName, "sheet", "Sheet1", "Set the worksheet name")
+	flag.StringVar(&sheetName, "s", "Sheet1", "Set the worksheet name (shorthand).")
+
+	flag.Parse()
+
 	r := csv.NewReader(bufio.NewReader(os.Stdin))
 	r.FieldsPerRecord = -1
 
@@ -30,8 +38,13 @@ func main() {
 	errCheck(err)
 
 	xlsx := excelize.NewFile()
-	sheet := "Sheet1"
+
+	sheet := sheetName
 	index := xlsx.NewSheet(sheet)
+
+	if sheet != "Sheet1" {
+		xlsx.DeleteSheet("Sheet1")
+	}
 
 	colNames := make([]string, len(header))
 	for i := range header {
