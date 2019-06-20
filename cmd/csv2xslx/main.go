@@ -72,7 +72,11 @@ func main() {
 		}
 	}
 	xlsx.SetActiveSheet(index)
-	err1 := xlsx.SaveAs("out.xlsx")
-	errCheck(err1)
+
+	buf, _ := xlsx.WriteToBuffer()
+	_, errWrite := buf.WriteTo(os.Stdout)
+	errCheck(errWrite)
+
+	//errCheck(xlsx.SaveAs("out.xlsx"))
 
 }
