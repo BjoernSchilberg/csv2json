@@ -13,6 +13,7 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
@@ -40,7 +41,7 @@ func createHeader(entry []map[string]interface{}) []string {
 	return t
 }
 
-func exportXLSX(records []map[string]interface{}, sheetName string) {
+func exportXLSX(records []map[string]interface{}, sheetName string, columns []string) {
 
 	xlsx := excelize.NewFile()
 	index := xlsx.NewSheet(sheetName)
@@ -50,7 +51,12 @@ func exportXLSX(records []map[string]interface{}, sheetName string) {
 	}
 
 	var header []string
-	header = createHeader(records)
+
+	if header == nil && len(columns) <= 0 {
+		header = createHeader(records)
+	} else {
+		header = columns
+	}
 	colNames := make([]string, len(header))
 	for i := range header {
 		colNames[i], _ = excelize.ColumnNumberToName(i + 1)
@@ -89,6 +95,8 @@ func main() {
 	var sheetName string
 	var arrayStructure bool
 	var objectName string
+	var listOfColumns string
+	var columns []string
 
 	flag.StringVar(&sheetName, "sheet", "Sheet1", "Set the worksheet name")
 	flag.StringVar(&sheetName, "s", "Sheet1", "Set the worksheet name (shorthand).")
@@ -96,8 +104,14 @@ func main() {
 	flag.BoolVar(&arrayStructure, "a", true, "Is pure JSON array structure (shorthand).")
 	flag.StringVar(&objectName, "object", "", "The name of the JSON object that holds the JSON array structure")
 	flag.StringVar(&objectName, "o", "", "The name of the JSON object that holds the JSON array structure (shorthand).")
+	flag.StringVar(&listOfColumns, "c", "", "List of columns which should be exported (shorthand).")
+	flag.StringVar(&listOfColumns, "columns", "", "List of columns which should be exported (shorthand).")
 
 	flag.Parse()
+
+	if len(listOfColumns) > 0 {
+		columns = strings.Split(listOfColumns, ",")
+	}
 
 	decoder := json.NewDecoder(bufio.NewReader(os.Stdin))
 
@@ -114,7 +128,7 @@ func main() {
 
 		}
 
-		exportXLSX(target, sheetName)
+		exportXLSX(target, sheetName, columns)
 
 	} else {
 		var records []map[string]interface{}
@@ -122,7 +136,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Cannot decode JSON file: %v.\n", err)
 		}
-		exportXLSX(records, sheetName)
+		exportXLSX(records, sheetName, columns)
 	}
 
 }
