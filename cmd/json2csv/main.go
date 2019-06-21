@@ -16,21 +16,21 @@ import (
 	"strings"
 )
 
-func createHeader(entry []map[string]interface{}) []string {
-	names := make(map[string]string)
-	for _, eintrag := range entry {
-		for name := range eintrag {
-			names[name] = name
+func createHeader(entries []map[string]interface{}) []string {
+	uniqueMap := make(map[string]string)
+	for _, entry := range entries {
+		for name := range entry {
+			uniqueMap[name] = ""
 
 		}
 	}
-	var t []string
-	for k := range names {
-		t = append(t, k)
+	var names []string
+	for k := range uniqueMap {
+		names = append(names, k)
 
 	}
-	sort.Strings(t)
-	return t
+	sort.Strings(names)
+	return names
 }
 
 func exportCSV(lines []map[string]interface{}, columns []string) {
