@@ -41,7 +41,7 @@ func createHeader(entries []map[string]interface{}) []string {
 	return names
 }
 
-func exportXLSX(records []map[string]interface{}, sheetName string, columns []string) {
+func exportXLSX(records []map[string]interface{}, sheetName string, header []string) {
 
 	xlsx := excelize.NewFile()
 	index := xlsx.NewSheet(sheetName)
@@ -50,14 +50,12 @@ func exportXLSX(records []map[string]interface{}, sheetName string, columns []st
 		xlsx.DeleteSheet("Sheet1")
 	}
 
-	var header []string
-
-	if header == nil && len(columns) <= 0 {
+	if header == nil {
 		header = createHeader(records)
-	} else {
-		header = columns
 	}
+
 	colNames := make([]string, len(header))
+
 	for i := range header {
 		colNames[i], _ = excelize.ColumnNumberToName(i + 1)
 	}
