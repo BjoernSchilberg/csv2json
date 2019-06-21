@@ -12,6 +12,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strconv"
 
 	"github.com/360EntSecGroup-Skylar/excelize"
 )
@@ -22,15 +23,21 @@ func errCheck(err error) {
 	}
 }
 
-func createHeader(entry map[string]interface{}) []string {
-	names := make([]string, len(entry))
-	var i int
-	for name := range entry {
-		names[i] = name
-		i++
+func createHeader(entry []map[string]interface{}) []string {
+	names := make(map[string]string)
+	for _, eintrag := range entry {
+		for name := range eintrag {
+			names[name] = name
+
+		}
 	}
-	sort.Strings(names)
-	return names
+	var t []string
+	for k := range names {
+		t = append(t, k)
+
+	}
+	sort.Strings(t)
+	return t
 }
 
 func exportXLSX(records []map[string]interface{}, sheetName string) {
@@ -43,30 +50,28 @@ func exportXLSX(records []map[string]interface{}, sheetName string) {
 	}
 
 	var header []string
+	header = createHeader(records)
+	colNames := make([]string, len(header))
+	for i := range header {
+		colNames[i], _ = excelize.ColumnNumberToName(i + 1)
+	}
+	// Set first row as header
+	for i, entry := range header {
+		xlsx.SetCellStr(sheetName, colNames[i]+"1", entry)
+	}
 
 	for rowIndex, entry := range records {
-		header = createHeader(entry)
-		colNames := make([]string, len(header))
-		for i := range header {
-			colNames[i], _ = excelize.ColumnNumberToName(i + 1)
-		}
-
-		// Set first row as header
-		for i, entry := range header {
-			xlsx.SetCellStr(sheetName, colNames[i]+"1", entry)
-		}
-
+		rowS := strconv.Itoa(rowIndex + 2)
 		for cellIndex, name := range header {
-			col, _ := excelize.ColumnNumberToName(cellIndex + 1)
 			if _, found := entry[name]; found {
 				switch t := entry[name].(type) {
 				case string:
-					xlsx.SetCellStr(sheetName, fmt.Sprintf("%s%d", col, rowIndex+2), t)
+					xlsx.SetCellStr(sheetName, colNames[cellIndex]+rowS, t)
 				case float64:
-					xlsx.SetCellStr(sheetName, fmt.Sprintf("%s%d", col, rowIndex+2), fmt.Sprint(t))
+					xlsx.SetCellStr(sheetName, colNames[cellIndex]+rowS, fmt.Sprint(t))
 				}
 			} else {
-				xlsx.SetCellStr(sheetName, fmt.Sprintf("%s%d", col, rowIndex+2), "")
+				xlsx.SetCellStr(sheetName, colNames[cellIndex]+rowS, "")
 			}
 			cellIndex++
 		}
