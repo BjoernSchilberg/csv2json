@@ -13,6 +13,7 @@ import (
 	"log"
 	"os"
 	"sort"
+	"strings"
 )
 
 func createHeader(entry []map[string]interface{}) []string {
@@ -32,12 +33,18 @@ func createHeader(entry []map[string]interface{}) []string {
 	return t
 }
 
-func exportCSV(lines []map[string]interface{}) {
+func exportCSV(lines []map[string]interface{}, columns []string) {
 	out := csv.NewWriter(bufio.NewWriter(os.Stdout))
 
 	var header, record []string
-	if header == nil {
+	if header == nil && len(columns) <= 0 {
 		header = createHeader(lines)
+		record = make([]string, len(header))
+		if err := out.Write(header); err != nil {
+			log.Fatalf("Error writing CSV: %v\n", err)
+		}
+	} else {
+		header = columns
 		record = make([]string, len(header))
 		if err := out.Write(header); err != nil {
 			log.Fatalf("Error writing CSV: %v\n", err)
@@ -74,13 +81,21 @@ func main() {
 
 	var arrayStructure bool
 	var objectName string
+	var listOfColumns string
+	var columns []string
 
 	flag.BoolVar(&arrayStructure, "array", true, "Is pure JSON array structure")
 	flag.BoolVar(&arrayStructure, "a", true, "Is pure JSON array structure (shorthand).")
 	flag.StringVar(&objectName, "object", "", "The name of the JSON object that holds the JSON array structure")
 	flag.StringVar(&objectName, "o", "", "The name of the JSON object that holds the JSON array structure (shorthand).")
+	flag.StringVar(&listOfColumns, "c", "", "List of columns which should be exported (shorthand).")
+	flag.StringVar(&listOfColumns, "columns", "", "List of columns which should be exported (shorthand).")
 
 	flag.Parse()
+
+	if len(listOfColumns) > 0 {
+		columns = strings.Split(listOfColumns, ",")
+	}
 
 	decoder := json.NewDecoder(bufio.NewReader(os.Stdin))
 
@@ -97,7 +112,7 @@ func main() {
 
 		}
 
-		exportCSV(target)
+		exportCSV(target, columns)
 
 	} else {
 		var lines []map[string]interface{}
@@ -105,7 +120,7 @@ func main() {
 		if err != nil {
 			log.Fatalf("Cannot decode JSON file: %v.\n", err)
 		}
-		exportCSV(lines)
+		exportCSV(lines, columns)
 	}
 
 }
