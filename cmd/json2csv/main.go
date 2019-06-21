@@ -37,18 +37,16 @@ func exportCSV(lines []map[string]interface{}, columns []string) {
 	out := csv.NewWriter(bufio.NewWriter(os.Stdout))
 
 	var header, record []string
+
 	if header == nil && len(columns) <= 0 {
 		header = createHeader(lines)
-		record = make([]string, len(header))
-		if err := out.Write(header); err != nil {
-			log.Fatalf("Error writing CSV: %v\n", err)
-		}
 	} else {
 		header = columns
-		record = make([]string, len(header))
-		if err := out.Write(header); err != nil {
-			log.Fatalf("Error writing CSV: %v\n", err)
-		}
+	}
+
+	record = make([]string, len(header))
+	if err := out.Write(header); err != nil {
+		log.Fatalf("Error writing CSV: %v\n", err)
 	}
 
 	for line, entry := range lines {
