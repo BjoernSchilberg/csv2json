@@ -8,6 +8,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -25,16 +26,7 @@ func createHeader(entry map[string]interface{}) []string {
 	return names
 }
 
-func main() {
-
-	decoder := json.NewDecoder(bufio.NewReader(os.Stdin))
-
-	var lines []map[string]interface{}
-	err := decoder.Decode(&lines)
-	if err != nil {
-		log.Fatalf("Cannot decode JSON file: %v.\n", err)
-	}
-
+func exportCSV(lines []map[string]interface{}) {
 	out := csv.NewWriter(bufio.NewWriter(os.Stdout))
 
 	var header, record []string
@@ -69,4 +61,45 @@ func main() {
 	if err := out.Error(); err != nil {
 		log.Fatalf("Error flushing CSV: %v\n", err)
 	}
+
+}
+
+func main() {
+
+	var arrayStructure bool
+	var objectName string
+
+	flag.BoolVar(&arrayStructure, "array", true, "Is pure JSON array structure")
+	flag.BoolVar(&arrayStructure, "a", true, "Is pure JSON array structure (shorthand).")
+	flag.StringVar(&objectName, "object", "", "The name of the JSON object that holds the JSON array structure")
+	flag.StringVar(&objectName, "o", "", "The name of the JSON object that holds the JSON array structure (shorthand).")
+
+	flag.Parse()
+
+	decoder := json.NewDecoder(bufio.NewReader(os.Stdin))
+
+	if !arrayStructure {
+		var obj map[string]interface{}
+		err := decoder.Decode(&obj)
+		if err != nil {
+			log.Fatalf("Cannot decode JSON file: %v.\n", err)
+		}
+
+		var target []map[string]interface{}
+		for _, v := range obj[objectName].([]interface{}) {
+			target = append(target, v.(map[string]interface{}))
+
+		}
+
+		exportCSV(target)
+
+	} else {
+		var lines []map[string]interface{}
+		err := decoder.Decode(&lines)
+		if err != nil {
+			log.Fatalf("Cannot decode JSON file: %v.\n", err)
+		}
+		exportCSV(lines)
+	}
+
 }
