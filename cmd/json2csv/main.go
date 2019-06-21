@@ -15,30 +15,36 @@ import (
 	"sort"
 )
 
-func createHeader(entry map[string]interface{}) []string {
-	names := make([]string, len(entry))
-	var i int
-	for name := range entry {
-		names[i] = name
-		i++
+func createHeader(entry []map[string]interface{}) []string {
+	names := make(map[string]string)
+	for _, eintrag := range entry {
+		for name := range eintrag {
+			names[name] = name
+
+		}
 	}
-	sort.Strings(names)
-	return names
+	var t []string
+	for k := range names {
+		t = append(t, k)
+
+	}
+	sort.Strings(t)
+	return t
 }
 
 func exportCSV(lines []map[string]interface{}) {
 	out := csv.NewWriter(bufio.NewWriter(os.Stdout))
 
 	var header, record []string
+	if header == nil {
+		header = createHeader(lines)
+		record = make([]string, len(header))
+		if err := out.Write(header); err != nil {
+			log.Fatalf("Error writing CSV: %v\n", err)
+		}
+	}
 
 	for line, entry := range lines {
-		if header == nil {
-			header = createHeader(entry)
-			record = make([]string, len(header))
-			if err := out.Write(header); err != nil {
-				log.Fatalf("Error writing CSV: %v\n", err)
-			}
-		}
 		for i, name := range header {
 			var value string
 			if v, found := entry[name]; found {
