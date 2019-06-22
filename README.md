@@ -12,8 +12,10 @@
   - [csv2xlsx](#csv2xlsx)
     - [Get it](#Get-it-2)
     - [Use it](#Use-it-2)
+  - [json2xlsx](#json2xlsx)
+    - [Get it](#Get-it-3)
+    - [Use it](#Use-it-3)
   - [License](#License)
-
 
 ## csv2json
 
@@ -104,6 +106,33 @@ csv2xlsx < file.csv > file.xlsx
 
 ```shell
 csv2xlsx -sheet=observations < file.csv > file.xlsx
+```
+
+## json2xlsx
+
+- Reads JSON array structure from standard in or optional an JSON object whichs holds the JSON array structure
+- Outputs a XLSX to standard out.
+
+### Get it
+
+```shell
+go get -u bitbucket.org/BjoernSchilberg/csv2json/cmd/json2xlsx
+```
+
+Place the resulting `json2xlsx` in your `$PATH`.
+
+### Use it
+
+```shell
+jsonxlsx -h
+```
+
+```shell
+json2xlsx < file.csv > file.xlsx
+```
+
+```shell
+json2xlsx -sheet=observations -array=false -object=observations < file.csv > file.xlsx
 ```
 
 ## License
